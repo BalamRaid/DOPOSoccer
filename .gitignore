@@ -1,14 +1,20 @@
 # ============================================================
 # DOPOSoccer - archivos que NO deben versionarse
-# Regla: solo se sube código fuente, documentación y modelos.
+# Regla: solo se sube código fuente, documentación, modelos y
+# la configuración de VS Code (IDE de sustentación).
 # ============================================================
 
-# --- IDEs (configuración personal, no del proyecto) ---
+# --- IDEs ---
+# IntelliJ NO se usa en la entrega: se ignora por completo.
 .idea/
-.vscode/
 *.iml
 *.ipr
 *.iws
+
+# VS Code SÍ se usa: .vscode/ se VERSIONA a propósito.
+# Contiene settings.json con "referencedLibraries": lib/*.jar.
+# Si se ignora, un clon vuelve a tener "org.junit cannot be resolved".
+# No añadir .vscode/ a este archivo.
 
 # --- Salidas de compilación (se regeneran) ---
 out/
@@ -22,6 +28,9 @@ sources.tmp
 doposoccer-errors.log
 *.log
 *.tmp
+
+# --- Informes internos (no se entregan) ---
+AUDITORIA_DOPOSOCCER.txt
 
 # --- Backups y comprimidos ---
 *.zip

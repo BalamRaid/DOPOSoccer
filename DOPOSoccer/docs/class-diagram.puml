@@ -1,110 +1,162 @@
 @startuml
+' ============================================================
+' MAPA DE CAJAS — léelo antes de agregar clases nuevas
+'
+' Col 1 IZQ.  1 · presentación       entrada / salida (Swing)
+' Col 2       2 · application        orquestación de casos de uso
+' Col 3 CEN.  3 · domain · NÚCLEO    DOPOSoccer + Player + Ball
+' Col 4 DER.  4a character  4b effect  4c match  4d control  4e math
+' Fila abajo  5 · infrastructure     detalle técnico (errores)
+'
+' REGLA DE ORO: cada clase nueva va en la columna de su paquete.
+'   - Personaje / tiro nuevo  -> 4a, al lado de StraightShot,
+'                                TornadoShot, IllusionShot
+'   - Efecto nuevo            -> 4b, al lado de los otros efectos
+'   - Tipo de partido nuevo   -> 3, al lado de GoalMatch / TimeMatch
+'   - Regla de cancha nueva   -> 4c, al lado de GoalDetector
+'   - Controlador / intención -> 4d
+'   - Utilidad geométrica     -> 4e
+' Así el diagrama siempre se explica de IZQUIERDA a DERECHA.
+' ============================================================
+
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
 skinparam shadowing false
+skinparam linetype ortho
+skinparam classFontSize 11
+skinparam packageFontSize 12
+hide empty members
+left to right direction
 
-package "presentation" {
-  class DOPOSoccerGUI
-  class SetupPanel
-  class GamePanel
-  class GameRenderer
-  class HumanController
-  class KeyboardState
-  class KeyBindings
-  class Resolution
-  class Look
+package "1 · presentación\n(entrada / salida)" as presentation {
+  together {
+    class DOPOSoccerGUI
+    class SetupPanel
+    class GamePanel
+    class GameRenderer
+    class HumanController
+    class KeyboardState
+    class KeyBindings
+    class Resolution
+    class Look
+  }
 }
 
-package "application" {
-  class GameSession
-  class MatchConfig
-  class MatchResult
-  class SurvivalSeries
-  enum GameMode
+package "2 · application\n(casos de uso)" as application {
+  together {
+    class GameSession
+    class MatchConfig
+    class MatchResult
+    class SurvivalSeries
+    enum GameMode
+  }
 }
 
-package "domain" {
-  class DOPOSoccer
-  class Player
-  class Ball
-  class Profile
-  class Stats
-  class Side
-  class Stat
-  class PowerShotState
-  class DOPOSoccerException
-  class Field
-  class GoalMatch
-  class TimeMatch
-  class SurvivalMatch
-  abstract class MatchType
+package "3 · domain · NÚCLEO" as domain {
+  together {
+    class DOPOSoccer
+    class Player
+    class Ball
+    class Profile
+    class Stats
+    class Stat
+    class Side
+    class Field
+    class PowerShotState
+    class DOPOSoccerException
+    abstract class MatchType
+    class GoalMatch
+    class TimeMatch
+    class SurvivalMatch
+  }
 }
 
-package "domain.match" {
-  class Arena
-  class Goal
-  class GoalDetector
-  class Score
-  class MatchClock
+package "4a · domain.character\n(personajes y tiros)" as domain_character {
+  together {
+    class CharacterCatalog
+    class CharacterDefinition
+    class CharacterStats
+    class SpecialAbility
+    interface PowerShot
+    interface PowerShotWorld
+    class StraightShot
+    class TornadoShot
+    class IllusionShot
+  }
 }
 
-package "domain.character" {
-  class CharacterCatalog
-  class CharacterDefinition
-  class CharacterStats
-  class SpecialAbility
-  interface PowerShot
-  class StraightShot
-  class TornadoShot
-  class IllusionShot
+package "4b · domain.effect\n(estados temporales)" as domain_effect {
+  together {
+    abstract class Effect
+    class PushEffect
+    class ElectrocutedEffect
+    class UnconsciousEffect
+    class ConfusionEffect
+    class FreezeEffect
+    class ShrinkEffect
+  }
 }
 
-package "domain.effect" {
-  interface Effect
-  class PushEffect
-  class ElectrocutedEffect
-  class UnconsciousEffect
-  class ConfusionEffect
-  class FreezeEffect
-  class ShrinkEffect
+package "4c · domain.match\n(cancha y reglas)" as domain_match {
+  together {
+    class Arena
+    class Goal
+    class GoalDetector
+    class Score
+    class MatchClock
+  }
 }
 
-package "domain.control" {
-  class AiController
-  interface PlayerController
-  interface MatchView
-  record PlayerIntent
+package "4d · domain.control\n(intenciones y vista)" as domain_control {
+  together {
+    interface PlayerController
+    interface MatchView
+    record PlayerIntent
+    class AiController
+  }
 }
 
-package "domain.math" {
-  class Vec2
+package "4e · domain.math\n(geometría)" as domain_math {
+  together {
+    class Vec2
+  }
 }
 
-package "infrastructure" {
-  class ErrorLog
+package "5 · infrastructure\n(detalle técnico)" as infrastructure {
+  together {
+    class ErrorLog
+  }
 }
 
+' ---- 1 -> 2 -> 3 : flujo de entrada ----
 DOPOSoccerGUI --> SetupPanel
 DOPOSoccerGUI --> GamePanel
 DOPOSoccerGUI --> GameSession
 DOPOSoccerGUI --> SurvivalSeries
 SetupPanel --> MatchConfig
 SetupPanel --> CharacterCatalog
+SetupPanel --> Profile
+SetupPanel --> Resolution
+SetupPanel --> Look
+
 GamePanel --> GameSession
 GamePanel --> GameRenderer
 GamePanel --> HumanController
 GamePanel --> KeyboardState
-GameRenderer --> MatchView
+
+GameRenderer --> DOPOSoccer
 HumanController ..|> PlayerController
 HumanController --> KeyboardState
 HumanController --> KeyBindings
 
+' ---- 2 -> 3 : orquestación ----
 GameSession --> MatchConfig
 GameSession --> DOPOSoccer
 GameSession --> AiController
 SurvivalSeries --> GameSession
 SurvivalSeries --> MatchResult
 
+' ---- 3 : núcleo ----
 DOPOSoccer ..|> MatchView
 DOPOSoccer *-- "2" Player
 DOPOSoccer *-- "1" Ball
@@ -114,48 +166,65 @@ DOPOSoccer *-- "1" MatchClock
 DOPOSoccer *-- "1" PowerShotState
 DOPOSoccer --> "1" MatchType
 DOPOSoccer --> GoalDetector
+DOPOSoccer ..> PowerShotWorld : pasa addFakeBall
 
 Player --> Profile
 Player --> CharacterDefinition
 Player --> "0..1" Effect
 Player --> "0..1" PlayerController
 Player --> Vec2
+Player --> Stats
+Profile --> Stats
 Ball --> Arena
 Ball --> Vec2
-
-CharacterCatalog o-- CharacterDefinition
-CharacterDefinition --> CharacterStats
-CharacterDefinition --> SpecialAbility
-SpecialAbility --> PowerShot
-SpecialAbility --> Effect : crea
-StraightShot ..|> PowerShot
-TornadoShot ..|> PowerShot
-IllusionShot ..|> PowerShot
 
 GoalMatch --|> MatchType
 TimeMatch --|> MatchType
 SurvivalMatch --|> MatchType
 
-PushEffect ..|> Effect
-ElectrocutedEffect ..|> Effect
-UnconsciousEffect ..|> Effect
-ConfusionEffect ..|> Effect
-FreezeEffect ..|> Effect
-ShrinkEffect ..|> Effect
+' ---- 4a : personajes y tiros ----
+CharacterCatalog o-- CharacterDefinition
+CharacterDefinition --> CharacterStats
+CharacterDefinition --> SpecialAbility
+SpecialAbility --> PowerShot
+SpecialAbility --> Effect : crea
+SpecialAbility ..> PowerShotWorld : recibe
+PowerShot ..> PowerShotWorld : recibe
+StraightShot ..|> PowerShot
+TornadoShot ..|> PowerShot
+IllusionShot ..|> PowerShot
 
-AiController ..|> PlayerController
-AiController --> MatchView
-PlayerController --> PlayerIntent
-PlayerController --> MatchView
+' ---- 4b : efectos ----
+PushEffect --|> Effect
+ElectrocutedEffect --|> Effect
+UnconsciousEffect --|> Effect
+ConfusionEffect --|> Effect
+FreezeEffect --|> Effect
+ShrinkEffect --|> Effect
 
-Player --> Stats
-Profile --> Stats
+' ---- 4c : cancha ----
 Arena *-- "2" Goal
 GoalDetector --> Arena
 Goal --> Vec2
 
+' ---- 4d : control ----
+AiController ..|> PlayerController
+AiController --> MatchView
+PlayerController ..> PlayerIntent : devuelve
+PlayerController ..> MatchView : consulta
+
+' ---- 5 : técnico ----
 DOPOSoccerGUI --> ErrorLog
-SetupPanel --> Profile
-SetupPanel --> Resolution
-SetupPanel --> Look
+
+legend bottom right
+  CÓMO EXPLICARLO EN 4 PASOS
+
+  1. Elige modo y personaje en presentación.
+  2. application crea GameSession y llama a DOPOSoccer.step(dt).
+  3. El núcleo mueve Player/Ball y actualiza Score/MatchClock.
+  4. GameRenderer pinta ese estado; ErrorLog guarda fallos.
+
+  Al agregar una caja, pégala en la columna de su paquete
+  y dibuja SOLO la flecha hacia una clase que ya existe.
+end legend
 @enduml

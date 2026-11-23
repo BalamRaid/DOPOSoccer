@@ -52,9 +52,9 @@ En IntelliJ: click derecho sobre `src/doposoccer/test` →
 
 ```text
 DopoSoccer/
-├── DOPOSoccer.asta          Modelo UML (Astah)
-├── Retrospectiva.md         Retrospectiva del proyecto
-├── AUDITORIA_DOPOSOCCER.txt Auditoría técnica y reparaciones
+├── DOPOSoccer.asta           Modelo UML original (Astah)
+├── DOPOSoccer-FinalEli.asta  Modelo UML final (Astah)
+├── Retrospectiva.md          Retrospectiva del proyecto
 └── DOPOSoccer/
     ├── src/doposoccer/
     │   ├── domain/          Reglas del juego (núcleo, sin Swing ni IO)
