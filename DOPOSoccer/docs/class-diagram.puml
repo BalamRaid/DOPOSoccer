@@ -1,0 +1,161 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "presentation" {
+  class DOPOSoccerGUI
+  class SetupPanel
+  class GamePanel
+  class GameRenderer
+  class HumanController
+  class KeyboardState
+  class KeyBindings
+  class Resolution
+  class Look
+}
+
+package "application" {
+  class GameSession
+  class MatchConfig
+  class MatchResult
+  class SurvivalSeries
+  enum GameMode
+}
+
+package "domain" {
+  class DOPOSoccer
+  class Player
+  class Ball
+  class Profile
+  class Stats
+  class Side
+  class Stat
+  class PowerShotState
+  class DOPOSoccerException
+  class Field
+  class GoalMatch
+  class TimeMatch
+  class SurvivalMatch
+  abstract class MatchType
+}
+
+package "domain.match" {
+  class Arena
+  class Goal
+  class GoalDetector
+  class Score
+  class MatchClock
+}
+
+package "domain.character" {
+  class CharacterCatalog
+  class CharacterDefinition
+  class CharacterStats
+  class SpecialAbility
+  interface PowerShot
+  class StraightShot
+  class TornadoShot
+  class IllusionShot
+}
+
+package "domain.effect" {
+  interface Effect
+  class PushEffect
+  class ElectrocutedEffect
+  class UnconsciousEffect
+  class ConfusionEffect
+  class FreezeEffect
+  class ShrinkEffect
+}
+
+package "domain.control" {
+  class AiController
+  interface PlayerController
+  interface MatchView
+  record PlayerIntent
+}
+
+package "domain.math" {
+  class Vec2
+}
+
+package "infrastructure" {
+  class ErrorLog
+}
+
+DOPOSoccerGUI --> SetupPanel
+DOPOSoccerGUI --> GamePanel
+DOPOSoccerGUI --> GameSession
+DOPOSoccerGUI --> SurvivalSeries
+SetupPanel --> MatchConfig
+SetupPanel --> CharacterCatalog
+GamePanel --> GameSession
+GamePanel --> GameRenderer
+GamePanel --> HumanController
+GamePanel --> KeyboardState
+GameRenderer --> MatchView
+HumanController ..|> PlayerController
+HumanController --> KeyboardState
+HumanController --> KeyBindings
+
+GameSession --> MatchConfig
+GameSession --> DOPOSoccer
+GameSession --> AiController
+SurvivalSeries --> GameSession
+SurvivalSeries --> MatchResult
+
+DOPOSoccer ..|> MatchView
+DOPOSoccer *-- "2" Player
+DOPOSoccer *-- "1" Ball
+DOPOSoccer *-- "1" Arena
+DOPOSoccer *-- "1" Score
+DOPOSoccer *-- "1" MatchClock
+DOPOSoccer *-- "1" PowerShotState
+DOPOSoccer --> "1" MatchType
+DOPOSoccer --> GoalDetector
+
+Player --> Profile
+Player --> CharacterDefinition
+Player --> "0..1" Effect
+Player --> "0..1" PlayerController
+Player --> Vec2
+Ball --> Arena
+Ball --> Vec2
+
+CharacterCatalog o-- CharacterDefinition
+CharacterDefinition --> CharacterStats
+CharacterDefinition --> SpecialAbility
+SpecialAbility --> PowerShot
+SpecialAbility --> Effect : crea
+StraightShot ..|> PowerShot
+TornadoShot ..|> PowerShot
+IllusionShot ..|> PowerShot
+
+GoalMatch --|> MatchType
+TimeMatch --|> MatchType
+SurvivalMatch --|> MatchType
+
+PushEffect ..|> Effect
+ElectrocutedEffect ..|> Effect
+UnconsciousEffect ..|> Effect
+ConfusionEffect ..|> Effect
+FreezeEffect ..|> Effect
+ShrinkEffect ..|> Effect
+
+AiController ..|> PlayerController
+AiController --> MatchView
+PlayerController --> PlayerIntent
+PlayerController --> MatchView
+
+Player --> Stats
+Profile --> Stats
+Arena *-- "2" Goal
+GoalDetector --> Arena
+Goal --> Vec2
+
+DOPOSoccerGUI --> ErrorLog
+SetupPanel --> Profile
+SetupPanel --> Resolution
+SetupPanel --> Look
+@enduml

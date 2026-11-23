@@ -1,0 +1,35 @@
+# ============================================================
+# DOPOSoccer - archivos que NO deben versionarse
+# Regla: solo se sube código fuente, documentación y modelos.
+# ============================================================
+
+# --- IDEs (configuración personal, no del proyecto) ---
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# --- Salidas de compilación (se regeneran) ---
+out/
+bin/
+build/
+target/
+*.class
+
+# --- Archivos generados en tiempo de ejecución ---
+sources.tmp
+doposoccer-errors.log
+*.log
+*.tmp
+
+# --- Backups y comprimidos ---
+*.zip
+*.bak
+*.backup
+*~
+
+# --- Sistema operativo ---
+.DS_Store
+Thumbs.db
+desktop.ini
