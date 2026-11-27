@@ -1,0 +1,6 @@
+*.class
+bin/
+*.log
+doposoccer-progress.dat
+sources.tmp
+.vscode/
